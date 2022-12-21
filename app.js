@@ -73,8 +73,9 @@ let middleWare = (request, response, next) => {
 
 app.get("/states/", middleWare, async (request, response) => {
   let data = `select * from state; `;
-  let result = DB.all(data);
+  let result = await DB.all(data);
   var array = [];
+  let finalResult = "";
 
   var objectConversion = (passedObject) => {
     let object = {
@@ -86,7 +87,7 @@ app.get("/states/", middleWare, async (request, response) => {
     return array;
   };
   for (let part of result) {
-    let finalResult = objectConversion(part);
+    finalResult = objectConversion(part);
   }
   response.send(finalResult);
 });
@@ -94,7 +95,7 @@ app.get("/states/", middleWare, async (request, response) => {
 app.get("/states/:stateId/", middleWare, async (request, response) => {
   let { stateId } = request.params;
   let data = `select * from state where state_id =${stateId}; `;
-  let result = DB.get(data);
+  let result = await DB.get(data);
 
   var objectConversion = (passedObject) => {
     let object = {
@@ -109,19 +110,20 @@ app.get("/states/:stateId/", middleWare, async (request, response) => {
 });
 
 app.post("/districts/", middleWare, async (request, response) => {
-  let { districtName, stateId, cases, cured, active, death } = request.body;
+  let { districtName, stateId, cases, cured, active, deaths } = request.body;
   let data = ` insert into district (
-      district_name,stateId,cases,cured,active,death)
+      district_name,state_id,cases,cured,active,deaths)
       values
       ("${districtName}",${stateId},${cases},${cured},${active},
-      ${death});
+      ${deaths});
       `;
   let finalResult = await DB.run(data);
   response.send("District Successfully Added");
 });
 app.get("/districts/:districtId/", middleWare, async (request, response) => {
   let { districtId } = request.params;
-  let data = ` select * from district where district_id =${districtId}
+  console.log(districtId);
+  let data = ` select * from district where district_id =${districtId};
       `;
   let result = await DB.get(data);
   var objectConversion = (passedObject) => {
@@ -147,6 +149,7 @@ app.delete("/districts/:districtId/", middleWare, async (request, response) => {
 });
 
 app.put("/districts/:districtId/", middleWare, async (request, response) => {
+  let { districtId } = request.params;
   let { districtName, stateId, cases, cured, active, deaths } = request.body;
   let data = `update district  set  district_name="${districtName}",
 state_id=${stateId},
@@ -162,7 +165,7 @@ where district_id=${districtId};
 app.get("/states/:stateId/stats/", middleWare, async (request, response) => {
   let { stateId } = request.params;
   let data = `select * from state where state_id =${stateId}; `;
-  let result = DB.get(data);
+  let result = await DB.get(data);
 
   var objectConversion = (passedObject) => {
     let object = {
