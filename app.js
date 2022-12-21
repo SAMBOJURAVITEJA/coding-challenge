@@ -58,12 +58,12 @@ let middleWare = (request, response, next) => {
   }
   if (jwtToken === undefined) {
     response.status(401);
-    response.send("Invalid JWT Token1");
+    response.send("Invalid JWT Token");
   } else {
     jwt.verify(jwtToken, "MY_SECRET_TOKEN", async (error, user) => {
       if (error) {
         response.status(401);
-        response.send("Invalid JWT Token2");
+        response.send("Invalid JWT Token");
       } else {
         next();
       }
@@ -123,7 +123,8 @@ app.post("/districts/", middleWare, async (request, response) => {
 app.get("/districts/:districtId/", middleWare, async (request, response) => {
   let { districtId } = request.params;
   console.log(districtId);
-  let data = ` select * from district where district_id =${districtId};
+  let data = ` select 
+  * from district where district_id =${districtId};
       `;
   let result = await DB.get(data);
   var objectConversion = (passedObject) => {
@@ -164,14 +165,22 @@ where district_id=${districtId};
 });
 app.get("/states/:stateId/stats/", middleWare, async (request, response) => {
   let { stateId } = request.params;
-  let data = `select * from state where state_id =${stateId}; `;
+  let data = `select 
+  sum(cases),
+  sum(cured),
+  sum(active),
+  sum(deaths)
+   from 
+   district 
+   where state_id =${stateId}; `;
   let result = await DB.get(data);
 
   var objectConversion = (passedObject) => {
     let object = {
-      stateId: passedObject.state_id,
-      stateName: passedObject.state_name,
-      population: passedObject.population,
+      totalCases: passedObject["sum(cases)"],
+      totalCured: passedObject["sum(cured)"],
+      totalActive: passedObject["sum(active)"],
+      totalDeaths: passedObject["sum(deaths)"],
     };
     return object;
   };
