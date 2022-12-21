@@ -100,7 +100,7 @@ app.get("/states/:stateId/", middleWare, async (request, response) => {
     let object = {
       stateId: passedObject.state_id,
       stateName: passedObject.state_name,
-      population: PassedObject.population,
+      population: passedObject.population,
     };
     return object;
   };
@@ -119,11 +119,11 @@ app.post("/districts/", middleWare, async (request, response) => {
   let finalResult = await DB.run(data);
   response.send("District Successfully Added");
 });
-app.post("/districts/:districtId/", middleWare, async (request, response) => {
+app.get("/districts/:districtId/", middleWare, async (request, response) => {
   let { districtId } = request.params;
   let data = ` select * from district where district_id =${districtId}
       `;
-  let result = await DB.run(data);
+  let result = await DB.get(data);
   var objectConversion = (passedObject) => {
     let object = {
       districtId: passedObject.district_id,
@@ -138,7 +138,6 @@ app.post("/districts/:districtId/", middleWare, async (request, response) => {
   };
   let finalResult = objectConversion(result);
   response.send(finalResult);
-  response.send("District Successfully Added");
 });
 app.delete("/districts/:districtId/", middleWare, async (request, response) => {
   let { districtId } = request.params;
@@ -169,7 +168,7 @@ app.get("/states/:stateId/stats/", middleWare, async (request, response) => {
     let object = {
       stateId: passedObject.state_id,
       stateName: passedObject.state_name,
-      population: PassedObject.population,
+      population: passedObject.population,
     };
     return object;
   };
