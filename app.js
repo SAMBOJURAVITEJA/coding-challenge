@@ -57,12 +57,12 @@ let middleWare = (request, response, next) => {
     jwtToken = Authorization.split(" ")[1];
   }
   if (jwtToken === undefined) {
-    response.status(400);
+    response.status(401);
     response.send("Invalid JWT Token1");
   } else {
     jwt.verify(jwtToken, "MY_SECRET_TOKEN", async (error, user) => {
       if (error) {
-        response.status(400);
+        response.status(401);
         response.send("Invalid JWT Token2");
       } else {
         next();
