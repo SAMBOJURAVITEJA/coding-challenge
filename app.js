@@ -328,30 +328,38 @@ app.get("/todos/:todoId/", async (request, response) => {
   response.send(got7);
 });
 app.get("/agenda/", async (request, response) => {
-  console.log("ravi");
-  let formatDate = format(new Date(2021, 0, 12), "yyyy-MM-dd");
-  console.log(formatDate);
-  console.log(typeof formatDate);
-  console.log(isValid(formatDate));
-  let data = `select  * from todo where due_date=${formatDate};`;
-  let finalresult = await DB.get(data);
-  console.log(finalresult);
-  /*var array = [];
-  let got7;
-  var modifying = (Object) => {
-    let object = {
-      id: Object.id,
-      todo: Object.todo,
-      priority: Object.priority,
-      status: Object.status,
-      category: Object.category,
-      dueDate: Object.due_date,
+  let formedDate = format(new Date(2021, 0, 12), "yyyy-MM-dd");
+  console.log(formedDate);
+  let valid = isValid(new Date(2021, 0, 21));
+  if (valid) {
+    let data = `select * from todo where due_date="${formedDate}";`;
+    let finalresult = await DB.all(data);
+    console.log(finalresult);
+
+    console.log(typeof formedDate);
+    var array = [];
+    let got7;
+    var modifying = (Object) => {
+      let object = {
+        id: Object.id,
+        todo: Object.todo,
+        priority: Object.priority,
+        status: Object.status,
+        category: Object.category,
+        dueDate: Object.due_date,
+      };
+      array.push(object);
+      return array;
     };
-    array.push(object);
-    return array;
-  };
-  got7 = modifying(finalresult);
-  response.send(got7);*/
+    for (let part of finalresult) {
+      got7 = modifying(part);
+    }
+    console.log(got7);
+    response.send(got7);
+  } else {
+    response.status(400);
+    response.send("Invalid Due Date");
+  }
 });
 
 app.post("/todos/", async (request, response) => {
