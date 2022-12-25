@@ -1,3 +1,6 @@
+const priorityList = ["HIGH", "MEDIUM", "LOW"];
+const categoryList = ["WORK", "HOME", "LEARNING"];
+const statusList = ["TO DO", "IN PROGRESS", "DONE"];
 let express = require("express");
 let DB = null;
 let app = express();
@@ -94,6 +97,7 @@ app.get("/todos/", async (request, response) => {
   console.log(search_q);
   let data = "";
   let finalresult = null;
+
   switch (true) {
     case categoryAndStatus(request.query):
       data = `select * from
@@ -364,11 +368,26 @@ app.get("/agenda/", async (request, response) => {
 
 app.post("/todos/", async (request, response) => {
   let { id, todo, priority, status, category, dueDate } = request.body;
-  let data = `insert into todo (id,todo,priority,status,category,due_date)
+  if (statusList.includes(status)) {
+    if (categoryList.includes(category)) {
+      if (priorityList.includes(priority)) {
+        let data = `insert into todo (id,todo,priority,status,category,due_date)
     values
     (${id},"${todo}","${priority}","${status}","${category}",${dueDate});`;
-  let finalresult = await DB.run(data);
-  response.send("Todo Successfully Added");
+        let finalresult = await DB.run(data);
+        response.send("Todo Successfully Added");
+      } else {
+        response.status(400);
+        response.send("Invalid Todo Priority");
+      }
+    } else {
+      response.status(400);
+      response.send("Invalid Todo Category");
+    }
+  } else {
+    response.status(400);
+    response.send("Invalid Todo Status");
+  }
 });
 
 app.put("/todos/:todoId/", async (request, response) => {
